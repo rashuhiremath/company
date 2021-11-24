@@ -1,0 +1,15 @@
+.heart{
+    font-size: 35px;
+    color:black;
+    margin-top: 7px;
+     width: 70px;
+     outline: none;
+     text-transform: uppercase;
+     cursor: pointer;
+     font-weight: bold;
+
+ }
+ .heart:active{
+     color: red;
+
+ }

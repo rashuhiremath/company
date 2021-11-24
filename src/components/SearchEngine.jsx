@@ -1,67 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button, FormControl } from "react-bootstrap";
 import { Container,Row,Col } from "react-bootstrap";
-import { Navbar, Nav, NavDropdown } from "react-bootstrap";
-import SerachJobs from "./SearchJobs.jsx";
+import { Link } from "react-router-dom";
+import uniqid from "uniqid"
+import {  useNavigate } from 'react-router-dom'
+
+import SearchJobs from "./SearchJobs.jsx";
 
 const SearchEngine = (props) => {
-  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const [jobs, setJobs] = useState([])
+  const navigate = useNavigate()
+  
+
+  const handleChange=(e)=>{
+        setQuery(e.target.value)
+  }
+
+ const  fetchTheJobs = async (e) => {
+    e.preventDefault()
+
+    const response = await fetch(`https://strive-jobs-api.herokuapp.com/jobs?search=${query}&limit=20`)
+
+    if (response.ok) {
+        const  data  = await response.json()
+
+        setJobs(data.data)
+       
+       
+    }else{
+        console.log("something went wrong")
+    }
+
+   
+
+}
 
   
   return (
-    <>
-      <Navbar bg="light" expand="lg">
-        <Container fluid>
-          <Navbar.Brand href="#">Navbar scroll</Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarScroll" />
-          <Navbar.Collapse id="navbarScroll">
-            <Nav
-              className="me-auto my-2 my-lg-0"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
-            >
-              <Nav.Link href="#action1">Home</Nav.Link>
-              <Nav.Link href="#action2">Link</Nav.Link>
-              <NavDropdown title="Link" id="navbarScrollingDropdown">
-                <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action4">
-                  Another action
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action5">
-                  Something else here
-                </NavDropdown.Item>
-              </NavDropdown>
-              <Nav.Link href="#" disabled>
-                Link
-              </Nav.Link>
-            </Nav>
-            <Form className="d-flex">
-              <FormControl
-                type="search"
-                placeholder="Search"
-                className="me-2"
-                aria-label="Search"
-                value={setSearch}
-                // onChange={(e) => setSearch({ search: e.target.value })}
-                onChange={(e)=> search(e.target.value)}
-              />
-              <Button variant="outline-success">Search</Button>
-            </Form>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-      <Row>
-        {props.jobs
-          .filter((job) =>job.title.toLowerCase().includes(search))
-          .map((job) => (
-            <Col xs={3}>
-              
-            </Col>
-          ))}
-      </Row>
-     
-    </>
+    <Container>
+                <Row>
+                    <Col xs={10} className='mx-auto my-3'>
+                        <h1>Jobs Search</h1>
+                    </Col>
+                    <Col xs={10} >
+                        <Form onSubmit={fetchTheJobs}>
+                            <Form.Control type="search" value={query} onChange={handleChange} placeholder="type and press Enter" />
+                        </Form>
+                    </Col>
+                    <Col>
+                   <Button onClick={()=>navigate("/favourites")}>Favourite</Button>
+                    </Col>
+                    <Col xs={10} >
+                        {
+                            jobs.map(job => <SearchJobs key={uniqid()} data={job} />)
+                        }
+                    </Col>
+                </Row>
+            </Container>
+      
   );
 };
 
